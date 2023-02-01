@@ -329,7 +329,7 @@ export async function buildVue({ verify = false, publish = false }) {
 		'utf-8',
 	)
 
-	await $`pnpm install --no-strict-peer-dependencies`
+	await $`pnpm install --no-frozen-lockfile --no-strict-peer-dependencies`
 	await $`nr build --release`
 	if (verify) {
 		await $`nr test`
