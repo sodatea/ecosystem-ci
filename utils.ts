@@ -317,7 +317,19 @@ function writeOrAppendNpmrc(dir: string, content: string) {
 
 export async function buildVue({ verify = false, publish = false }) {
 	cd(vuePath)
-	await $`ni --prefer-frozen`
+
+	const rootPkgJsonPath = path.join(vuePath, 'package.json')
+	const rootPkgJson = JSON.parse(
+		await fs.promises.readFile(rootPkgJsonPath, 'utf-8'),
+	)
+	rootPkgJson.resolutions = { terser: 'npm:@swc/core' }
+	await fs.promises.writeFile(
+		rootPkgJsonPath,
+		JSON.stringify(rootPkgJson, null, 2) + '\n',
+		'utf-8',
+	)
+
+	await $`pnpm install --no-frozen-lockfile --no-strict-peer-dependencies`
 	await $`nr build --release`
 	if (verify) {
 		await $`nr test`
